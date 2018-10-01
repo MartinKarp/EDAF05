@@ -1,0 +1,97 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Mon Mar 26 17:37:10 2018
+
+@author: martin
+"""
+
+import sys
+import time
+
+
+def main():
+    
+    mnames, wnames, mpref, wpref = process(sys.stdin.readlines())  
+    n = len(mpref)
+    prop = [0]*n
+    pairs = [-1]*n
+    q = [0]*n
+    for i in xrange(n):
+        q[i]=n-1-i
+
+    while len(q)>0:
+        m = q.pop()
+        w = mpref[m][prop[m]]
+        prop[m] +=1
+        if pairs[w] == -1:
+            pairs[w] = m
+        elif wpref[w][m] < wpref[w][pairs[w]]:
+            q.append(pairs[w])
+            pairs[w] = m
+        else:
+            q.append(m)
+    output(mnames,wnames,pairs)
+    
+def process(lines):
+    n = 0
+    ni = -1
+    mnames = []
+    wnames = []
+    mpref = []
+    wpref = []
+    for i in xrange(len(lines)):
+        line = lines[i]
+        if  line[0] == 'n':
+            n = int(line[2:])
+            ni = i
+            mpref, wpref = n*[0],n*[0]
+        if ni != -1:
+            if i <= ni + 2*n and i > ni:
+                split = line.split()
+                if (i - ni) % 2 == 0:
+                    wnames.append(split[1])
+                else:
+                    mnames.append(split[1])
+            elif i >=ni+2 + n*2:
+                split = line.split()
+                karta = list(map(int,split[1:]))
+                pref = n*[0]
+                index = int(split[0][:-1])
+                if int(split[0][:-1]) % 2 == 0:
+                    for i in xrange(n):
+                        pref[int((karta[i]-1)/2)] = i+1
+                        
+                    wpref[int((index-2)/2)] = pref
+                else:
+                    pref = [int((x-2)/2) for x in karta]
+                    mpref[int((index-1)/2)] = pref
+    return mnames, wnames, mpref, wpref
+
+def output(mnames, wnames, pairs):
+    n = len(pairs)
+    text = ['']*n
+    for wi in range(n):
+        mi = pairs[wi]
+        text[mi] = ' '.join([mnames[mi],'--',wnames[wi]])
+    print('\n'.join(text))
+    #with open(file,'w') as data:
+    #    data.writelines(text)
+    
+main()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
